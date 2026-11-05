@@ -201,6 +201,20 @@ Notas para agentes futuros:
 - Commits enviados: a93dc42 (E4b), 1323d2d (fix pre-push-check). Remoto: origin/main rastreado.
 - Git identity local neutra nos commits (`Minecraft RE Lab <mc-re-lab@localhost>`) — trocar pelo nome do usuário se desejar, via `git config user.name/email`.
 
+## 2026-11-05 — Sessão 6: E5 (worldgen) completo
+
+Arquitetura de geração dissecada:
+- **Entry**: `NoiseGeneratorSettings` (datapack) → `RandomState.create(settings, noises, seed)` → `router = noiseRouter.mapAll(NoiseWiringHelper)` (instancia NormalNoise por registry + rewia BlendedNoise com `terrainRandom`).
+- **NoiseRouter**: 15 DensityFunction (barrier, fluid_level_*, lava, temperature..ridges, preliminary_surface_level, final_density, vein_*).
+- **Executores**: BIOMES=`init_biomes` pool (completableFuture supplyAsync), NOISE=`wgen_fill_noise`, STRUCTURE/CARVE/SURFACE/FEATURES=worldgen, INITIALIZE_LIGHT/LIGHT=thread "light", FULL=main thread executor.
+- **NoiseChunk**: trilinear por célula (overworld 4×8), markers Interpolated/FlatCache/Cache2D/CacheOnce/CacheAllInCell; `blockStateRule` = Aquifer → OreVeinifier; BlockState null → defaultBlock.
+- **Biomas**: Climate.Sampler 7D → TargetPoint quantizado (×1e4); MultiNoiseBiomeSource → RTree(7D, 6 filhos/nó, L∞) — `findValue` = nearest; quart 4³ por seção (fillBiomesFromNoise).
+- **Estruturas**: StructureSet+placement (isStructureChunk spacing/separation/salt) → weighted choice (setLargeFeatureSeed) → generate com biome predicate; references r=8; decoration range n etapas, seed por feature.
+- FEATURES único write radius=1; CARVERS 17×17 scan.
+- Questões abertas W1–W8 (NoiseRouterData, Aquifer, OreVeinifier, SurfaceSystem datapack, OverworldBiomeBuilder, EndIslandDensityFunction).
+- Documentos: E5 discovery + knowledge/world/{world-generation, noise-system, biome-generation, chunk-generation-stages, structures-and-features}.md
+- GitHub: já sincronizado ANTES do E5 (bbffdce). Mudanças E5 ficaram LOCAIS por §9 do pedido ("Não faça push"); push só se o usuário pedir.
+
 ## Modelo de entrada para descobertas
 
 ```

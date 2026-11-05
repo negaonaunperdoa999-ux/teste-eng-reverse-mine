@@ -21,6 +21,20 @@
 - `isLightCorrect=false` ⇒ reload refaz INITIALIZE_LIGHT+LIGHT.
 - Glob search > grep (`Select-String`); lembrar de procurar callers com `-SimpleMatch` para evitar erro do scanner.
 
+## Worldgen 26.1.2 — fatos-chave (E5)
+- Overworld noise: `NoiseSettings OVERWORLD = (-64,384,1,2)` → cellWidth=4, cellHeight=8 (verify em NoiseSettings.java).
+- `NoiseRouter` = 15 DensityFunctions; wiring via RandomState (NoiseWiringHelper) com `noises` registry (Registries.NOISE).
+- `BlendedNoise`: minLimit/maxLimit Perlin(-15..0), main(-7..0), `xzMultiplier = 684.412 * xzScale`, `yMultiplier = 684.412 * yScale`; `valueFactor(NormalNoise) = 1/6 / expectedDeviation(span)`.
+- Markers: Interpolated→NoiseInterpolator(trilhinear) | FlatCache | Cache2D | CacheOnce | CacheAllInCell; bugdetect: "Trying to sample interpolator outside the interpolation loop".
+- BIOME executor: `init_biomes`; NOISE executor: `wgen_fill_noise`; FULL: main thread executor; STRUCTURE/SURFACE/...: worldgen.
+- Biomas: quart grid de 4 blocos (`QuartPos.toBlock(n) = n << 4`); consulta via R-tree 7D L∞ com ThreadLocal `lastResult`.
+- `fillBiomesFromNoise` preenche 4×4×4 quarts por seção (paletted container).
+- Estruturas: `isStructureChunk(spacing/separation/salt)` → weighted choice (setLargeFeatureSeed) → `structure.generate(biomePredicate)` → setStartForStructure; refs r=8.
+- SpawnMobs só em geração (SPAWN), nunca em load.
+- FEATURES é a única etapa com write radius=1; CARVERS varre ±8 (289 chunks).
+- Full pyramid write: NOISE=0, SURFACE=0, CARVERS=0, FEATURES=1.
+- "BlendedNoise minLimitNoise" vs "mainNoise" — nunca confundir amplitudes: min/max = 16 octaves, main = 8.
+
 ## Pacotes e classes-chave já mapeados (26.1.2)
 - Entrypoints: cliente `net.minecraft.client.main.Main#main` · servidor `net.minecraft.server.Main#main`.
 - Loop cliente: `Minecraft.run()` → `runTick()` → `renderFrame()` → `tick()` (20 TPS, DeltaTracker.Timer). Ver knowledge/architecture/game-loop.md.

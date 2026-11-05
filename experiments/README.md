@@ -16,6 +16,11 @@ Resultados são resumidos em `reports/` e promovidos para `knowledge/` quando co
 ## E3 — Registro de um bloco ✅ CONCLUÍDO (auxiliar)
 - Resultado: `knowledge/registries/block-registration.md`
 
+## E5 — Worldgen ✅ CONCLUÍDO
+- Resultado: `research/discoveries/E5-world-generation.md` + `knowledge/world/{world-generation, noise-system, biome-generation, chunk-generation-stages, structures-and-features}.md`.
+- Questões abertas W1–W8 (NoiseRouterData final chain, Aquifer, OreVeinifier, SurfaceSystem datagen, OverworldBiomeBuilder, EndIslandDensityFunction, FeatureSorter, WorldGenRegion semantics).
+- PRÓXIMO: E6 persistência/NBT OU E-networking geral OU E-entities; ou W1-W8 (E5b) para fechar worldgen.
+
 ## E4b — Light engine + H1–H8 ✅ CONCLUÍDO
 - Resultado: `research/discoveries/E4b-light-engine.md` + `knowledge/world/lighting-engine.md`, `lighting-threading.md`, `chunk-save-unload-integrity.md`.
 - H1–H8 todas resolvidas (detalhe no discovery E4 §10).
