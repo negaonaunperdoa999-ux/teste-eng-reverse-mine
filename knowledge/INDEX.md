@@ -23,6 +23,7 @@
 - `world/biome-generation.md` — MultiNoiseBiomeSource, R-tree 7D ✅ (E5)
 - `world/chunk-generation-stages.md` — ponte E4×E5, chamadas por estágio ✅ (E5)
 - `world/structures-and-features.md` — estruturas, carvers, decoração ✅ (E5)
+- `world/worldgen-internals.md` — Aquifer, OreVeinifier, EndIslands, TerrainProvider, WorldGenRegion, FeatureSorter ✅ (E5b)
 - `world/` — biomas, geração/worldgen detalhe (NÃO INICIADO)
 - `blocks/` — blocos, states, propriedades (PARCIAL: ver registries/block-registration.md)
 - `items/` — itens, componentes, receitas, tags (NÃO INICIADO)
@@ -38,7 +39,7 @@
 - `../research/discoveries/E2-game-loop.md` — loop principal [FATO]
 - `../research/discoveries/E4-chunk-loading.md` — pipeline de chunks + H1-H8 (todas resolvidas em E4b) [FATO]
 - `../research/discoveries/E4b-light-engine.md` — iluminação threading/engine + H1-H8 resolução [FATO]
-- `../research/discoveries/E5-world-generation.md` — geração procedural (noise/biomes/estruturas) + W1-W8 [FATO]
+- `../research/discoveries/E5-world-generation.md` — geração procedural (W1-W8 TODAS resolvidas em E5b §11) [FATO]
 - `../research/discoveries/` — futuras descobertas
 - `../research/hypotheses/` — hipóteses não verificadas
 - `../research/comparisons/` — comparações entre versões

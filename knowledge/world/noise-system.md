@@ -56,6 +56,19 @@ barrieiras (`barrier`), `fluid_level_floodedness`, `fluid_level_spread`, `lava`,
 - `factor(blend) = (noise/10 + 1) / 2`.
 - `QuartPos.toBlock(n) = n << 4`, `QuartPos.fromBlock(x) = x >> 4`.
 
+## Cadeia vanilla completa (NoiseRouterData, 26.1.2) [FATO]
+`shiftX/shiftZ = flatCache(cache2d(shiftA/B(shiftNoise)))`;
+`CONTINENTS/EROSION/RIDGES = flatCache(cache2d?/shiftedNoise2d(shiftX, shiftZ, 0.25, noises.X))`;
+`RIDGES_FOLDED = mul(add(add(abs(w), (−0.6666666666666666)).abs(), (−0.3333333333333333)), −3.0)` (= peaksAndValleys);
+`OFFSET = flatCache(cache2d(lerp(blendAlpha, blendOffset=0/10, spline(TerrainProvider.overworldOffset(continents, erosion, ridgesFolded, amplified)))))`;
+`FACTOR`, `JAGGEDNESS` idem (blend targets 10.0 / zero);
+`DEPTH = yClampedGradient(−64, 320, 1.5, −1.5) + OFFSET`;
+`initialDensity = mul(constant(4.0), mul(depth + jaggedness, factor).quarterNegative())`;
+`SLOPED_CHEESE = add(initialDensity, BASE_3D_NOISE_OVERWORLD(BlendedNoise 0.25/0.125/80/160/8))`;
+`caves = rangeChoice(slopedCheese, −∞..1.5625, min(slopedCheese, 5×ENTRANCES), underground(SPAGHETTI_2D, SPAGHETTI_ROUGHNESS, LAYER, CHEESE, PILLARS))`;
+`fullNoise = min(postProcess(slideOverworld(caves)), NOODLE)`, `postProcess = mul(interpolated(blendDensity(x)), 0.64).squeeze()`.
+Nether: `slideNetherLike(BASE_3D_NOISE_NETHER)` sobre zero; End: `islands = cache2d(endIslands(0L))` + `SLOPED_CHEESE_END = add(endIslands, BASE_3D_NOISE_END)`.
+
 ## Limitações
 - Cadeia vanilla exata (`final_density` squeezed etc.) não lida — não inventar os coeficientes de "continents→depth→ridges" aqui; qualquer documento futuro que cite a forma exata DEVE marcar fonte = data pack JSON (não este arquivo).
 - `PerlinNoise.wrap` operação não dissecada.

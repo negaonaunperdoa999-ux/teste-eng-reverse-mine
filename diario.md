@@ -215,6 +215,21 @@ Arquitetura de geração dissecada:
 - Documentos: E5 discovery + knowledge/world/{world-generation, noise-system, biome-generation, chunk-generation-stages, structures-and-features}.md
 - GitHub: já sincronizado ANTES do E5 (bbffdce). Mudanças E5 ficaram LOCAIS por §9 do pedido ("Não faça push"); push só se o usuário pedir.
 
+## 2026-11-05 — Sessão 7: E5b (fechamento das lacunas worldgen)
+
+Todas as hipóteses W1–W8 RESOLVIDAS com evidência real (ver E5 discovery §11 e `knowledge/world/worldgen-internals.md`):
+- **W1** NoiseRouterData/DensityFunctions: cadeia overworld linha a linha (offset→depth→jaggedness→`4×quarterNegative((d+j)×f)`→slopedCheese→caves(rangeChoice 1.5625)→postProcess.squeeze).
+- **W2** Aquifer: grade 16×12×16, centers aleatizados por seed, 4 mais próximos, `similarity = 1 −Δd²/25`, barreira `density + barrier > 0` ⇒ sólido; deep dark ⇒ floodedness=−1; sequências floodedness/lava por célula (lava se |lavaNoise|>0.3 & level ≤ −10).
+- **W3** OreVeinifier: toggle>0→COPPER (Y 0..50, filler GRANITE, ore COPPER_ORE/RAW_COPPER_BLOCK); senão IRON (Y −60..−8, filler TUFF, DEEPSLATE_IRON_ORE); edgeRoundoff=clampedMap(dist,1,0..20,−0.2,0); threshold |toggle|+roundoff≥0.4.
+- **W4** SurfaceSystem/SurfaceRuleData: `SurfaceRuleData.overworld()` por coluna (start em WORLD_SURFACE_WG+1 descending), `SurfaceRules.Context` compilado uma vez; regras por biome (badlands terrace, frozen ocean extension).
+- **W5** OverworldBiomeBuilder: CONFIRMADO ativo (`OverworldBiomeBuilder.java` 52,8 KB); thresholds de clima + `isDeepDarkRegion` usado por Aquifer; preset do datapack monta MultiNoiseBiomeSourceParameterList (`NoiseData.bootstrap` — não lido por inteiro).
+- **W6** WorldGenRegion: getChunk barra acesso fora do pirâmide → `ReportedException` com categoria completa (nunca lê fora — erro de wiring vira crash report, não corrupção).
+- **W7** FeatureSorter: DFS topológico sobre grafo FeatureData[step,index]; ciclos → reducedSources reportados; `indexMapping` global.
+- **W8** EndIslandDensityFunction: Simplex noise, `consumeCount(17292)`, vizinhos ±12, ilhas por `islandSize = (|x|·3439+|z|·147)%13+9` > threshold −0.9.
+- Pendências remanescentes re-numeradas V1–V7 (NoiseData.bootstrap, Noises registry, StructurePlacement exato, BiomeManager helpers, BelowZeroRetrogen, Blender, SurfaceRules eval).
+- Docs novos: `worldgen-internals.md`; atualizados: E5 discovery, noise-system, biome-generation, structures-and-features, chunk-generation-stages, INDEX, overview, diario, dicas, experiments/README.
+- Git: mudanças de E5b serão commitadas e enviadas ao GitHub (usuário determinou push permanente no rodapé da missão E5b).
+
 ## Modelo de entrada para descobertas
 
 ```

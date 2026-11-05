@@ -40,6 +40,9 @@ Overworld: `OVERWORLD_NOISE_SETTINGS = (-64, 384, 1, 2)`.
 - **Armazenamento**: `.mca` + `Status` (ver `chunk-storage.md`) — 26.1.2 NÃO grava nada de noise no disco (tudo deriva da seed + datapack) — exceto blending_data/ abaixo-zero-retrogen (dados de conversão legado).
 - **Estruturas**: StructureSet + Placement (spacing/separation/salt) — `createStructures`/`createReferences` (ver `structures-and-features.md`).
 
+## Resoluções E5b (W1–W8, 2026-11-05)
+Ver `../research/discoveries/E5-world-generation.md` §11 (cadeia overworld completa) e `worldgen-internals.md` (Aquifer/OreVeinifier/WorldGenRegion/FeatureSorter/EndIsland/TerrainProvider). Correção à nota acima: `depth = yClampedGradient(-64, 320, 1.5, -1.5) + OFFSET` (offset = spline 2D continent/erosion/ridges) — verificado no código do `NoiseRouterData.registerTerrainNoises` (`offsetToDepth`).
+
 ## Armadilhas
 - Bioma de um bloco ≠ bioma "para 4×4×4" — quart blocks: 4×4×4 blocos por quart; o PALETTED container guarda a mesma referência para todo o quart.
 - `depth` ≠ altura em bloco — `Depth` é função composta (`1.0 - 2.0 * y/(height)` ou similar no router; NÃO verificada numericamente).

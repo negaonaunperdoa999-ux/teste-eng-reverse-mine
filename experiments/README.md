@@ -16,6 +16,11 @@ Resultados são resumidos em `reports/` e promovidos para `knowledge/` quando co
 ## E3 — Registro de um bloco ✅ CONCLUÍDO (auxiliar)
 - Resultado: `knowledge/registries/block-registration.md`
 
+## E5b — Fechamento worldgen ✅ CONCLUÍDO
+- Resultado: W1–W8 todas resolvidas (ver `research/discoveries/E5-world-generation.md` §11) + `knowledge/world/worldgen-internals.md`.
+- Pendências remanescentes V1–V7 (NoiseData.bootstrap, Noises registry, StructurePlacement, BiomeManager helpers, BelowZeroRetrogen, Blender, SurfaceRules eval).
+- PRÓXIMO: E6 persistência/NBT OU Entidades (recomendado: Entidades — maior sistema desconhecido).
+
 ## E5 — Worldgen ✅ CONCLUÍDO
 - Resultado: `research/discoveries/E5-world-generation.md` + `knowledge/world/{world-generation, noise-system, biome-generation, chunk-generation-stages, structures-and-features}.md`.
 - Questões abertas W1–W8 (NoiseRouterData final chain, Aquifer, OreVeinifier, SurfaceSystem datagen, OverworldBiomeBuilder, EndIslandDensityFunction, FeatureSorter, WorldGenRegion semantics).

@@ -30,6 +30,9 @@ flowchart LR
 `blockStateWriteRadius`: NOISE=0, SURFACE=0, CARVERS=0, **FEATURES=1** (única etapa com cross-chunk write).
 LOADING_PYRAMID variante: apenas `loadStructureStarts` + `initializeLight` + `light` + `full` — todo terreno já em disco.
 
+## Acesso a chunks vizinhos durante worldgen [FATO — conferido em E5b]
+`WorldGenRegion.getChunk(x, z)` só devolve chunks com distância Chebyshev `< generatingStep.directDependencies().size()` — fora lança `ReportedException("Requested chunk unavailable during world generation")` com categoria completa. `hasChunk(...)` idêntico. `WorldGenTickAccess` garante que block/fluid ticks ficam dentro do chunk gerador. Código de worldgen NUNCA lê fora do pirâmide.
+
 ## Transições de objetos
 ```
 ProtoChunk (status=EMPTY/NP...) → preenche NOISE/`BELOW_ZERO_RETROGEN` → CARVERS(CarvingMask) 

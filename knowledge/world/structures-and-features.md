@@ -1,6 +1,9 @@
 # Mundo — Estruturas, cavernas e decoração (26.1.2)
 
-**Confiança:** [FATO] · Evidência: `research/discoveries/E5-world-generation.md` §8
+**Confiança:** [FATO] · Evidência: `research/discoveries/E5-world-generation.md`
+
+## 0. Ordenação de features (FeatureSorter) [FATO]
+`FeatureSorter.buildFeaturesPerStep(featureSources, featureGetter, tryReducingError)` → grafo `FeatureData[step, index]` com arestas para o PRÓXIMO feature na lista do mesmo bioma → DFS topológico (`Graph.depthFirstSearch`) → ciclos detectados (com `tryReducingError` reduz fontes iterativamente; senão `IllegalStateException("Feature order cycle found")` com `reducedSources`). `indexMapping()` global por `Util.createIndexIdentityLookup`; `StepFeatureData` por step. Consumidor: `ChunkGenerator.featuresPerStep` (cache memoizado por generator) → `applyBiomeDecoration`.
 
 ## 1. Estruturas — pipeline
 

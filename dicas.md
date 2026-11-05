@@ -10,6 +10,9 @@
 - Envio adaptativo: PlayerChunkSender desiredChunksPerTick inicial 9.0 (0.01..64), `maxUnacknowledgedBatches=1→10` após 1º ACK.
 - Semantic: vanilla NÃO envia pacote se `sendSync` pendente (getChunkToSend null).
 
+## NoiseRouterData (vanilla, 26.1.2) — fatos registrados
+- Cadeia overworld: `shiftX/shiftZ = flatCache(cache2d(shiftA/B))`, `CONTINENTS/EROSION = flatCache(shiftedNoise2d(shiftX, shiftZ, 0.25, noises))`, `RIDGES_FOLDED` = peaksAndValleys, `OFFSET = flatCache(cache2d(lerp(blendAlpha, blendOffset, spline(terrain.overworldOffset)))) + (−0.50375F)`, `DEPTH = yClampedGradient(−64,320,1.5,−1.5) + OFFSET`, `initialDensity = 4.0×quarterNegative((depth+jaggedness)×factor)`, `SLOPED_CHEESE = initialDensity + BASE_3D_NOISE_OVERWORLD`, `caves = rangeChoice(SC, 1.5625, min(SC, 5×ENTRANCES), underground(...))`, `fullNoise = min(postProcess(slideOverworld(caves)), NOODLE).squeeze()`.
+- Nether: `slideNetherLike(BASE_3D_NOISE_NETHER(0.25, 0.375, 80, 60, 8))` sobre zeros. End: `islands = cache2d(endIslands(0L))`, `SLOPED_CHEESE_END = add(endIslands, BASE_3D_NOISE_END(0.25, 0.25, 80, 160, 4))`.
 ## Iluminação 26.1.2 — fatos-chave (E4b)
 - Toda luz passa por `ThreadedLevelLightEngine.addTask` → `lightTaskDispatcher` (ChunkTaskPriorityQueue, menor ticket level = prioridade) → `light` ConsecutiveExecutor → `runUpdate`: PRE → `super.runLightUpdates()` (block+sky fixpoint, drena) → POST.
 - batch = 1000 tasks (`lightTasks`); `taskPerBatch`/`DEFAULT_BATCH_SIZE` = 1000 (um deles não usado fora).
@@ -34,6 +37,12 @@
 - FEATURES é a única etapa com write radius=1; CARVERS varre ±8 (289 chunks).
 - Full pyramid write: NOISE=0, SURFACE=0, CARVERS=0, FEATURES=1.
 - "BlendedNoise minLimitNoise" vs "mainNoise" — nunca confundir amplitudes: min/max = 16 octaves, main = 8.
+
+## Aquifer/OreVeins 26.1.2 — fatos registrados
+- Aquifer: grade 16×12×16; centros por `positionalRandomFactory.at()`; 12 candidatos → 4 mais próximos; `similarity = 1 − Δd²/25`; `DEEP DARK ⇒ floodedness = −1`; lava se `|lavaNoise| > 0.3` e nível ≤ −10 (células 64×40).
+- OreVeinifier: `vein_toggle > 0` → COPPER (Y 0..50, filler GRANITE); senão IRON (Y −60..−8, filler TUFF); `|toggle| + edgeRoundoff ≥ 0.4`; `veinRidged < 0`; `richness = clampedMap(|toggle|, 0.4, 0.6, 0.1, 0.3)`; 2% raw blocks.
+- WorldGenRegion: acesso a chunks fora do pirâmide ⇒ `ReportedException` (não silencioso).
+- FeatureSorter: DFS topológico sobre grafo `FeatureData[step, index]`; ciclos ⇒ `reducedSources` no erro.
 
 ## Pacotes e classes-chave já mapeados (26.1.2)
 - Entrypoints: cliente `net.minecraft.client.main.Main#main` · servidor `net.minecraft.server.Main#main`.
