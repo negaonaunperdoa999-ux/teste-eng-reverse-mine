@@ -12,9 +12,9 @@ Push-Location $root
 
 $tracked = & git ls-files
 $violations = $tracked | Where-Object {
-  $_ -match '(^|/)(sources|work|diffs|workspace)/' -or
+  $_ -match '(^|/)(sources|work|diffs|workspace)(/|$)' -or
   $_ -match '\.(jar|class)$' -or
-  $_ -match 'eula\.txt$' -or
+  $_ -match '(^|/)eula\.txt$' -or
   $_ -match 'net[/\\]minecraft[/\\].*\.java$' -or
   $_ -match 'com[/\\]mojang[/\\].*\.java$' -or
   $_ -match '(^|/)\.minecraft/' -or
