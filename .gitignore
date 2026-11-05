@@ -1,0 +1,33 @@
+# .gitignore — repo PÚBLICO de conhecimento próprio
+# NUNCA versionar conteúdo proprietário ou decompilado da Mojang
+
+# Fontes decompiladas e caches de ferramentas
+sources/
+work/
+diffs/
+workspace/
+eula.txt
+*.jar
+*.class
+
+# Instalações/dados do jogo
+.minecraft/
+**/saves/
+**/assets/
+
+# Ferramentas clonadas que contêm código de terceiros (mantemos só docs próprios)
+tools/universal-modder/
+tools/MinecraftSourcesGenerator/
+
+# Ambientes e builds
+.gradle/
+build/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# SO/editores
+.DS_Store
+Thumbs.db
+*.log
