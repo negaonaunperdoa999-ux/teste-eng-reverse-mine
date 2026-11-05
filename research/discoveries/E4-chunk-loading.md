@@ -154,15 +154,17 @@ Ordem (índice = posição no `CHUNK_STATUSES`, `getStatusList()` reverso de FUL
 - `prepareTickingChunk` vs `prepareEntityTickingChunk` — nuance de callers (entity ticking 31). **Não confundir** com spawn de entidades.
 - `THROTTLE` — `CHUNK_SAVED_PER_TICK`/`CHUNK_SAVED_EAGERLY_PER_TICK`/`EAGER_CHUNK_SAVE_COOLDOWN_IN_MILLIS` sem usos no ChunkMap (H1).
 
-## 10. Questões pendentes / hipóteses (TODO E4b)
-- H1: constantes declaradas-e-não-usadas em ChunkMap (`CHUNK_SAVED_PER_TICK` etc.) — buscar uso global; se ausente, código morto (flag: 26.1.2 pode ter substituído por throttle inline 10 s).
-- H2: `resendBiomesForChunks` / quando usado (Ressync de biome streaming em debug?).
-- H3: quem chama `activateAllDeactivatedTickets` (suspeita: MinecraftServer.loadLevel → ServerChunkCache.restart/activate).
-- H4: fluxo `ChunkTrackingView.Positioned.squareIntersects` otimização de diferença (raio<2 quando viewDistance pequena) — documentado como centrado na estrutura "Positioned".
-- H5: `ThreadedLevelLightEngine.initializeLight/lightChunk` — contrato das threads de light (não dissecado; separar para E-light).
-- H6: `chunksToUpdateFutures` acumula holders cujo ticketLevel mudou após `setLevel` — confirmado uso; confirmar todos os callers fora de DistanceManager (ex.: PlayerTicketTracker? não usa).
-- H7: Orden de `onChunkReadyToSend` vs `ChunkStatusUpdateListener` (ChunkMap sa)?
-- H8: `generationSaveSyncFuture` — não bloquear save durante geração (confirmado por leitura: `increaseGenerationRefCount` → `generationSaveSyncFuture` completado em decreaseGenerationRefCount; usada como save dependency).
+## 10. Hipóteses — RESOLVIDAS (2026-11-05, missão E4b)
+Detalhe completo em `research/discoveries/E4b-light-engine.md` e nos `knowledge/world/*`.
+
+- **H1 — CONFIRMADA como código morto.** `CHUNK_SAVED_PER_TICK`, `CHUNK_SAVED_EAGERLY_PER_TICK`, `EAGER_CHUNK_SAVE_COOLDOWN_IN_MILLIS`: ocorrências únicas em `ChunkMap.java` (declarações, sem uso). Throttle real de save por chunk = `nextChunkSaveTime.put(pos, now + 10000L)` inline (10 s). `MAX_ACTIVE_CHUNK_WRITES=128` É usado (saveChunksEagerly). [FATO — busca global]
+- **H2 — CONFIRMADA e nomeada.** `resendBiomesForChunks` é usada por `/fillbiome` (`FillBiomeCommand.java:143-147`): altera biomes via `fillBiomesFromNoise` e reenvia `ClientboundChunksBiomesPacket` (forChunks) aos players que rastreiam os chunks. Não é caminho de debug. [FATO]
+- **H3 — RESOLVIDA.** `activateAllDeactivatedTickets()`: chamado em `MinecraftServer.prepareLevels()` (linha ~556, fase `LOAD_INITIAL_CHUNKS` com `ChunkLoadCounter`), lendo `SavedDataStorage[TicketStorage.TYPE]` por nível. `deactivateTicketsOnClosing()`: chamado em loop em `prepareForShutdown` (linha ~669) até `hasWork()==false`, antes de `saveAllChunks`. Ciclo: shutdown desativa (exceto UNKNOWN) → persiste → boot re-ativa. [FATO]
+- **H4 — RESOLVIDA.** `ChunkTrackingView.Positioned.squareIntersects`: teste AABB (min ≤ max etc.), fast-path em `difference()` quando as duas views se intersectam; iteração no retângulo união com `contains(x,z)` (distância Chebyshev-quadrada vs raio, buffer 1; includeNeighbors=2). [FATO]
+- **H5 — RESOLVIDA.** Contrato completo do light engine em `E4b-light-engine.md` §3: `addTask` → `taskDispatcher` → acumula `lightTasks` (batch 1000) → `consecutiveExecutor` (“light”) → `runUpdate` (PRE → `runLightUpdates` (fixpoint block+sky) → POST). `runLightUpdates` fora da thread ⇒ exception. `waitForPendingTasks` = barreira por posição via POST vazio. [FATO — código lido integralmente]
+- **H6 — RESOLVIDA.** `chunksToUpdateFutures` (ReferenceOpenHashSet<ChunkHolder>): escrito **exclusivamente** por `LoadingChunkTracker.setLevel`; drenado **exclusivamente** por `DistanceManager.runAllUpdates` (duas loops). PlayerTicketTracker NÃO escreve nele. [FATO — busca global]
+- **H7 — RESOLVIDA.** Listener de status: `chunkStatusListener.onChunkStatusChange(pos, status)` ← `ChunkMap.onFullChunkStatusChange` ← `scheduleFullChunkPromotion` (`GenerationChunkHolder/ChunkHolder`) após a confirmação do future de promoção (FULL, BLOCK_TICKING ou ENTITY_TICKING — 3 promotions escalonados). Implementado por `this.entityManager::updateChunkStatus` (`PersistentEntitySectionManager`) — atualiza seções de entidade/persistência. `ChunkStatusUpdateListener` NÃO tem relação direta com o envio de chunks (send): o caminho de envio é `prepareTickingChunk` → `onChunkReadyToSend` → `PlayerChunkSender`; listener e send podem coincidir em tempo no mesmo tick, mas são caminhos independentes; listener sempre precede o envio efetivo completo. [FATO]
+- **H8 — CONFIRMADA como design correto.** `increaseGenerationRefCount` (0→1 cria novo `generationSaveSyncFuture` + `addSaveDependency`); `decreaseGenerationRefCount` (1→0) completa-o → compõe `ChunkHolder.saveSyncFuture` junto com os futures de full/accessible/ticking. Save nunca ocorre enquanto há refs de geração pendentes. [FATO]
 
 ## Referências (fontes consultadas)
 Arquivos listados na seção 2. Lições aplicadas: 12 buscas direcionadas com Select-String; sem benchmarks; sem execução do jogo.

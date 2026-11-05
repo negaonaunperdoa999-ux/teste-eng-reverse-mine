@@ -10,6 +10,17 @@
 - Envio adaptativo: PlayerChunkSender desiredChunksPerTick inicial 9.0 (0.01..64), `maxUnacknowledgedBatches=1→10` após 1º ACK.
 - Semantic: vanilla NÃO envia pacote se `sendSync` pendente (getChunkToSend null).
 
+## Iluminação 26.1.2 — fatos-chave (E4b)
+- Toda luz passa por `ThreadedLevelLightEngine.addTask` → `lightTaskDispatcher` (ChunkTaskPriorityQueue, menor ticket level = prioridade) → `light` ConsecutiveExecutor → `runUpdate`: PRE → `super.runLightUpdates()` (block+sky fixpoint, drena) → POST.
+- batch = 1000 tasks (`lightTasks`); `taskPerBatch`/`DEFAULT_BATCH_SIZE` = 1000 (um deles não usado fora).
+- `runLightUpdates()` em thread errada → exception explícita.
+- `waitForPendingTasks(x,z)` = barreira POST por posição; consumidor: `waitForLightBeforeSending` (só EnderDragon usa hoje).
+- Estratégia visible/updating + copy-on-write + batch `changedSections` → `swapSectionMap()` ao final de `runLightUpdates()`; leitores (save/render) só veem visible.
+- Seção sem dados NUNCA aloca DataLayer (sectionStates byte: bit5 HAS_DATA, bits0–4 neighborCount).
+- `SerializableChunkData.copyOf` copia tudo no main thread — encode async depois, seguro.
+- `isLightCorrect=false` ⇒ reload refaz INITIALIZE_LIGHT+LIGHT.
+- Glob search > grep (`Select-String`); lembrar de procurar callers com `-SimpleMatch` para evitar erro do scanner.
+
 ## Pacotes e classes-chave já mapeados (26.1.2)
 - Entrypoints: cliente `net.minecraft.client.main.Main#main` · servidor `net.minecraft.server.Main#main`.
 - Loop cliente: `Minecraft.run()` → `runTick()` → `renderFrame()` → `tick()` (20 TPS, DeltaTracker.Timer). Ver knowledge/architecture/game-loop.md.

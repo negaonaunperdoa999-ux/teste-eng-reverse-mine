@@ -182,6 +182,17 @@ Notas para agentes futuros:
 - Já sabemos o pipeline de ticks (E2): todo chunk passa por ServerLevel.tick → chunkSource.tick — ancore sempre ali.
 - Para ServerLevel.tick: seções em ~340-560 (world border → weather → tickPending → ... → randomTick).
 
+## 2026-11-05 — Sessão 4: E4b (Light engine + H1–H8)
+
+- Light engine dissecado: ThreadedLevelLightEngine → lightTaskDispatcher → batch de 1000 (`lightTasks`) → `consecutiveExecutor "light"` → `runUpdate` (PRE → `runLightUpdates` → POST). `runLightUpdates()` fora da thread ⇒ exception. Light tasks passam pelo ChunkTaskPriorityQueue (por ticket level) — NADA pesado roda na dispatcher thread.
+- BlockLightEngine: checkNode → emission (ou 0) → PULL_LIGHT_IN_ENTRY trick; increase/decrease fixpoint com oclusão VoxelShape; opacidade mínima 1. SkyLightEngine: ChunkSkyLightSources (lowestSourceY por coluna) + propagateFromEmptySections (seções vazias por borda).
+- LayerLightSectionStorage: updatingSectionData (escritores) vs visibleSectionData (leitores/save) — swap atômico em `runLightUpdates()`; seção states byte (bit5 HAS_DATA + bits0–4 neighborCount ≤26); seções sem dados nunca alocam DataLayer; sectionsAffectedByLightUpdates → onLightUpdate → ServerChunkCache → chunkHolder.sectionLightChanged (markUnsaved → broadcast chunk changes).
+- Integridade save/unload: `SerializableChunkData.copyOf` deep-copy NO MAIN THREAD (chunkSections copy, DataLayer copy, heightmaps clone), encode async em backgroundExecutor; unload espera saveSyncFuture (refs geração + full/ticking futures); luz incompleta no disco é recalculada no reload (LIGHT/INITIALIZE_LIGHT gate `isLighted()`).
+- **H1-H8 TODAS RESOLVIDAS** — detalhe em `research/discoveries/E4-chunk-loading.md` §10 e `research/discoveries/E4b-light-engine.md`.
+- Documentos criados: E4b discovery + knowledge/world/lighting-engine.md, lighting-threading.md, chunk-save-unload-integrity.md; E4 discovery/INDEX/overview/dicas/experiments atualizados.
+- GitHub: `gh auth login --web` iniciado em background com código 5464-CA5B (github.com/login/device) — aguardando usuário completar; commit local seguro prévio de todos docs; push pendente da autenticação.
+- NÃO foi encontrada regressão comprovada — R1–R5 riscos teóricos documentados.
+
 ## Modelo de entrada para descobertas
 
 ```

@@ -15,6 +15,9 @@
 - `world/chunk-tickets.md` — tipos, níveis, propagação BFS, view distance ✅ (E4)
 - `world/chunk-storage.md` — .mca, IOWorker, NBT, unload ✅ (E4)
 - `world/chunk-networking.md` — protocolo de batch, envio adaptativo, cliente ✅ (E4)
+- `world/lighting-engine.md` — block/sky light, swap visible/updating ✅ (E4b)
+- `world/lighting-threading.md` — contrato async, tryScheduleUpdate, runUpdate ✅ (E4b)
+- `world/chunk-save-unload-integrity.md` — copyOf, saveSyncFuture, races, riscos R1–R5 ✅ (E4b)
 - `world/` — biomas, geração/worldgen detalhe (NÃO INICIADO)
 - `blocks/` — blocos, states, propriedades (PARCIAL: ver registries/block-registration.md)
 - `items/` — itens, componentes, receitas, tags (NÃO INICIADO)
@@ -28,11 +31,12 @@
 ## Pesquisa
 - `../research/discoveries/E1-initialization.md` — init completa [FATO]
 - `../research/discoveries/E2-game-loop.md` — loop principal [FATO]
-- `../research/discoveries/E4-chunk-loading.md` — pipeline de chunks + H1-H8 [FATO]
+- `../research/discoveries/E4-chunk-loading.md` — pipeline de chunks + H1-H8 (todas resolvidas em E4b) [FATO]
+- `../research/discoveries/E4b-light-engine.md` — iluminação threading/engine + H1-H8 resolução [FATO]
 - `../research/discoveries/` — futuras descobertas
 - `../research/hypotheses/` — hipóteses não verificadas
 - `../research/comparisons/` — comparações entre versões
 - `../research/references/` — tool-comparison, decisions, external-docs
 
 ## Experimentos
-- `../experiments/README.md` — E1 init ✅ · E2 game loop ✅ · E3 block registration ✅ (aux) · **E4 chunks ✅ — loading/status/tickets/storage/networking documentados** · E5 receitas · E6 texturas
+- `../experiments/README.md` — E1 init ✅ · E2 game loop ✅ · E3 block registration ✅ (aux) · E4 chunks ✅ · **E4b iluminação + hipóteses ✅** · E5 receitas/worldgen · E6 texturas

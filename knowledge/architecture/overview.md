@@ -28,6 +28,7 @@ Cliente: acumula tempo com `DeltaTracker.Timer` (20 TPS alvo, máx. 10 catch-up)
 - Ciclo principal: `architecture/game-loop.md` ✅ (E2)
 - Registries/registro de bloco: `registries/block-registration.md` ✅ (E3)
 - Mundo/chunks (loading/status/tickets/storage/networking): `world/chunk-*.md` ✅ (E4)
+- Iluminação: `world/lighting-engine.md`, `lighting-threading.md`, `chunk-save-unload-integrity.md` ✅ (E4b)
 
 ## Sistemas pendentes (prioridade sugerida)
 Worldgen detalhado (biomas, ruído, estruturas) → Entidades/IA → Networking (protocolo geral) → Persistência/NBT → Renderização → Áudio → Blocos/Itens → Física

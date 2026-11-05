@@ -16,6 +16,11 @@ Resultados são resumidos em `reports/` e promovidos para `knowledge/` quando co
 ## E3 — Registro de um bloco ✅ CONCLUÍDO (auxiliar)
 - Resultado: `knowledge/registries/block-registration.md`
 
+## E4b — Light engine + H1–H8 ✅ CONCLUÍDO
+- Resultado: `research/discoveries/E4b-light-engine.md` + `knowledge/world/lighting-engine.md`, `lighting-threading.md`, `chunk-save-unload-integrity.md`.
+- H1–H8 todas resolvidas (detalhe no discovery E4 §10).
+- PRÓXIMO: E5 worldgen detalhado (estruturas/biomas/ruído) ou E6 persistência/NBT; depois Entidades.
+
 ## E4 — Carregamento de um chunk ✅ CONCLUÍDO
 - Resultado: `research/discoveries/E4-chunk-loading.md` + `knowledge/world/chunk-loading.md`, `chunk-status.md`, `chunk-tickets.md`, `chunk-storage.md`, `chunk-networking.md`.
 - Pipeline completo: ServerLevel.tick → ServerChunkCache.tick → DistanceManager/stack de tickets → ChunkMap → GenerationChunkHolder → ChunkGenerationTask → ChunkStatusTasks → FULL (mainThreadExecutor).
