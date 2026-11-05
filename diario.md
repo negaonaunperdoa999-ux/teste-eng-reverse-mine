@@ -159,6 +159,29 @@ Ver `research/discoveries/E2-game-loop.md` e `knowledge/architecture/game-loop.m
 - Repo GitHub: NÃO publicar ainda (ordem do usuário 2026-11-04). gh ainda NÃO autenticado. NUNCA push nesta etapa.
 - Commits locais: permitidos se conteúdo seguro (pre-push-check.ps1).
 
+## 2026-11-05 — Sessão 3: E4 completo (chunks)
+
+Investigação estática profunda do sistema de chunks. Documentos criados:
+- `research/discoveries/E4-chunk-loading.md` (evidência completa + H1–H8 + refs)
+- `knowledge/world/chunk-loading.md` (pipeline) · `chunk-status.md` · `chunk-tickets.md` · `chunk-storage.md` · `chunk-networking.md`
+- Atualizados: INDEX.md, overview.md, dicas.md
+
+Achados principais (todos [FATO] salvo nota):
+1. Pipeline: ServerLevel.tick → ServerChunkCache.tick → purgeStaleTickets → runDistanceManagerUpdates (BFS min-fixed-point nos 3 trackers) → ChunkHolder/updatingChunkMap → ChunkGenerationTask (pirâmide EMPTY→FULL, camadas ±acumuladas) → ChunkTaskPriorityQueue (46 filas, menor nível = prioridade) → ConsecutiveExecutor worldgen/light → applyStep → tarefas (structure starts/refs r=8, biomes, noise w/ BelowZeroRetrogen, surface, carvers, features w/ blockStateWriteRadius=1, light) → FULL no mainThreadExecutor (ProtoChunk→LevelChunk).
+2. Níveis: MAX_LEVEL=44, RADIUS_AROUND_FULL_CHUNK=11 (verificado computando acumulados do GENERATION_PYRAMID); FULL=33, BLOCK_TICKING=32, ENTITY_TICKING=31; byStatus: S_STARTS/EMPTY→44, BIOMES→36, NOISE..CARVERS→35, FEATURES/INIT_LIGHT→34, LIGHT/SPAWN/FULL→33; generationStatus(level)=getStatusAroundFullChunk(level−33).
+3. Tickets são SavedData (`chunk_tickets`) — só persist() sobrevive restart; PLAYER_LOADING=31 (radius=viewDist via PlayerTicketTracker, dispatcher 4 permits), PLAYER_SIMULATION=max(0,31−simDist) (default 10 → 21). UNKNOWN (timeout 1 tick) provisório para qualquer getChunk.
+4. `.mca` por região 32×32, setores 4 KB, cache 256, IOWorker com PriorityConsecutiveExecutor(FOREGROUND/BACKGROUND/SHUTDOWN) coalescendo pendingWrites; save eager ≤20/tick, ≤128 writes, throttle 10 s por chunk.
+5. Descarga: toDrop → pendingUnloads → scheduleUnload (aguarda saveSyncFuture) → save+unload+light update.
+6. Envio adaptativo client-driven: ClientboundChunkBatchStart/Finished + ClientboundLevelChunkWithLightPacket; ServerboundChunkBatchReceivedPacket; desired 9.0 inicial, clamp 0.01..64; 1→10 maxUnacknowledged após ACK; sendSync gate; 2 MB cap no payload.
+7. Sintaxe real: sem "ChunkSerializer" separado — SerializableChunkData direto; sem ChunkTicket.java — Ticket dentro de Ticket.java.
+8. H1–H8 registrados como pendentes (constantes mortas em ChunkMap: CHUNK_SAVED_PER_TICK=200/CHUNK_SAVED_EAGERLY_PER_TICK=20/EAGER_CHUNK_SAVE_COOLDOWN_IN_MILLIS=10000 sem usos no arquivo; nextChunkSaveTime usa +10000L inline; MAX_ACTIVE_CHUNK_WRITES=128 USADO).
+
+Notas para agentes futuros:
+- Em 26.1.2 NÃO existe ChunkSerializer/ChunkTicket como classes separadas — não perder tempo procurando; use SerializableChunkData e Ticket.
+- `Select-String` > ripgrep (não instalado).
+- Já sabemos o pipeline de ticks (E2): todo chunk passa por ServerLevel.tick → chunkSource.tick — ancore sempre ali.
+- Para ServerLevel.tick: seções em ~340-560 (world border → weather → tickPending → ... → randomTick).
+
 ## Modelo de entrada para descobertas
 
 ```

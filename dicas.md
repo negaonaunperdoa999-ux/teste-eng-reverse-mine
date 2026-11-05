@@ -1,5 +1,15 @@
 # dicas.md — Dicas e convenções do laboratório
 
+### Chunks 26.1.2 — fatos-chave (E4)
+- ChunkStatus 0..11: EMPTY→FULL. `BuiltInRegistries.CHUNK_STATUS`. MAX_STRUCTURE_DISTANCE=8.
+- LOAD vs GEN é por camada via `canLoadWithoutGeneration()`; loaders tocam só `loadStructureStarts` + light + FULL (LOADING_PYRAMID).
+- `MAX_LEVEL=44`, `RADIUS_AROUND_FULL_CHUNK=11`, nível 33 = FULL, 32 BLOCK_TICKING, 31 ENTITY_TICKING.
+- `byStatus(FULL)=33`; UNKNOWN ticket (timeout 1) provisório para getChunk().
+- TicketStorage é SavedData (`chunk_tickets`), só persist() sobrevive restart; PLAYER_SIMULATION nível=max(0,31−simDist).
+- Propagação: DynamicGraphMinFixedPoint (min-fixed-point, custo+1 por anel Chebyshev).
+- Envio adaptativo: PlayerChunkSender desiredChunksPerTick inicial 9.0 (0.01..64), `maxUnacknowledgedBatches=1→10` após 1º ACK.
+- Semantic: vanilla NÃO envia pacote se `sendSync` pendente (getChunkToSend null).
+
 ## Pacotes e classes-chave já mapeados (26.1.2)
 - Entrypoints: cliente `net.minecraft.client.main.Main#main` · servidor `net.minecraft.server.Main#main`.
 - Loop cliente: `Minecraft.run()` → `runTick()` → `renderFrame()` → `tick()` (20 TPS, DeltaTracker.Timer). Ver knowledge/architecture/game-loop.md.

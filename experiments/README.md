@@ -16,10 +16,10 @@ Resultados são resumidos em `reports/` e promovidos para `knowledge/` quando co
 ## E3 — Registro de um bloco ✅ CONCLUÍDO (auxiliar)
 - Resultado: `knowledge/registries/block-registration.md`
 
-## E4 — Carregamento de um chunk (PRÓXIMO RECOMENDADO)
-- Objetivo: rastrear servidor → `ChunkMap`/`ChunkSource` → deserialização → `LevelChunk`; quem chama `level.tick` → `chunkSource.tick`.
-- Pontos de partida: `ServerLevel.tick` (seção chunkSource), `net/minecraft/server/level/ServerChunkCache.java`, `net/minecraft/world/level/chunk/storage/ChunkSerializer.java` (ou `SerializableChunkData`), formato `r.x.z.mca` ([DOC] wiki).
-- Validação: ler `ServerChunkCache` + `ChunkMap.scheduleChunkLoad` + pipeline de tickets (`TicketType`, `ChunkStatus`).
+## E4 — Carregamento de um chunk ✅ CONCLUÍDO
+- Resultado: `research/discoveries/E4-chunk-loading.md` + `knowledge/world/chunk-loading.md`, `chunk-status.md`, `chunk-tickets.md`, `chunk-storage.md`, `chunk-networking.md`.
+- Pipeline completo: ServerLevel.tick → ServerChunkCache.tick → DistanceManager/stack de tickets → ChunkMap → GenerationChunkHolder → ChunkGenerationTask → ChunkStatusTasks → FULL (mainThreadExecutor).
+- Pendências H1–H8 no discovery; próximos sub-experimentos: E4b (light engine + H1–H8), E5 worldgen/estruturas, E-networking-geral.
 
 ## E5 — Pipeline de uma receita
 - Objetivo: como `RecipeManager` carrega `RecipeHolder` de data packs e casa com inventários.
