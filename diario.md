@@ -193,6 +193,14 @@ Notas para agentes futuros:
 - GitHub: `gh auth login --web` iniciado em background com código 5464-CA5B (github.com/login/device) — aguardando usuário completar; commit local seguro prévio de todos docs; push pendente da autenticação.
 - NÃO foi encontrada regressão comprovada — R1–R5 riscos teóricos documentados.
 
+## 2026-11-05 — Sessão 5: Publicação no GitHub
+
+- `gh auth login --web` completado pelo usuário (conta `negaonaunperdoa999-ux`).
+- Repositório criado: `https://github.com/negaonaunperdoa999-ux/teste-eng-reverse-mine` (PÚBLICO, branch `main`).
+- Push inicial completo: 29 arquivos, 0 conteúdo proibido (auditado via `pre-push-check.ps1` e `git ls-tree` — único falso positivo "networking~work" corrigido no script).
+- Commits enviados: a93dc42 (E4b), 1323d2d (fix pre-push-check). Remoto: origin/main rastreado.
+- Git identity local neutra nos commits (`Minecraft RE Lab <mc-re-lab@localhost>`) — trocar pelo nome do usuário se desejar, via `git config user.name/email`.
+
 ## Modelo de entrada para descobertas
 
 ```
